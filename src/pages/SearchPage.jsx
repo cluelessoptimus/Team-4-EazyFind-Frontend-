@@ -28,6 +28,7 @@ export default function SearchPage() {
         return saved ? parseInt(saved, 10) : 0;
     });
     const [isLocating, setIsLocating] = useState(false);
+    const [locationAttempted, setLocationAttempted] = useState(false);
     // Suppress empty state flickering by tracking first-run completion.
     const [hasFetched, setHasFetched] = useState(false);
     const limit = 12;
@@ -71,9 +72,12 @@ export default function SearchPage() {
     // Automatic city detection based on geolocation. Falls back to a default city
     // if permissions are denied or detection fails.
     useEffect(() => {
-        if (filters.city === '' && !location) {
+        // Trigger location detection on startup to ensure a fresh proximity check and
+        // to fire the browser's permission prompt, even if we have a cached city.
+        if (!location && !locationAttempted) {
             if (!navigator.geolocation) {
                 setError('Geolocation is not supported by your browser');
+                setLocationAttempted(true);
                 return;
             }
 
@@ -90,6 +94,7 @@ export default function SearchPage() {
                 async (position) => {
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
+                    setLocationAttempted(true);
 
                     try {
                         const { detectCity } = await import('../api/client');
@@ -109,6 +114,7 @@ export default function SearchPage() {
                 },
                 (err) => {
                     setIsLocating(false);
+                    setLocationAttempted(true);
                     let errorMsg = 'Could not get your location.';
 
                     if (err.code === 1) {
