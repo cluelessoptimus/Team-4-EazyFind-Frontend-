@@ -23,6 +23,10 @@ export default function SearchPage() {
     const [location, setLocation] = useState(null);
     const [error, setError] = useState(null);
     const [page, setPage] = useState(1);
+    const [totalResults, setTotalResults] = useState(() => {
+        const saved = localStorage.getItem('eazyfind_last_count');
+        return saved ? parseInt(saved, 10) : 0;
+    });
     const [isLocating, setIsLocating] = useState(false);
     // Suppress empty state flickering by tracking first-run completion.
     const [hasFetched, setHasFetched] = useState(false);
