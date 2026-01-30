@@ -74,7 +74,7 @@ export default function Filter({ filters, onChange, cities = [], cuisines = [], 
                             onChange={(e) => onChange('city', e.target.value)}
                             className={`w-full pl-4 pr-10 py-3.5 bg-zinc-50 border-2 border-transparent rounded-[1.25rem] focus:bg-white focus:border-brand-500/20 focus:ring-4 focus:ring-brand-500/5 outline-none transition-all text-sm font-black appearance-none cursor-pointer shadow-sm group-hover:bg-white group-hover:border-zinc-100 ${isLocating ? 'animate-pulse text-brand-600 border-brand-200' : 'text-zinc-800'}`}
                         >
-                            <option value="">{isLocating ? 'Detecting...' : 'Current Location'}</option>
+                            <option value="" disabled>{isLocating ? 'Detecting Location...' : 'Select City...'}</option>
                             {cities.map(city => (
                                 <option key={city.id || city} value={city.city_name || city}>
                                     {city.city_name || city}

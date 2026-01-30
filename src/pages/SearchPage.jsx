@@ -90,17 +90,21 @@ export default function SearchPage() {
                 async (position) => {
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
-                    setLocation({ lat, lon });
-                    setIsLocating(false);
 
                     try {
                         const { detectCity } = await import('../api/client');
                         const data = await detectCity(lat, lon);
+
+                        // Atomically update both location and city to prevent redundant intermediate fetches.
+                        setLocation({ lat, lon });
                         if (data && data.city) {
                             setFilters(prev => ({ ...prev, city: data.city.toLowerCase() }));
                         }
                     } catch (err) {
                         console.error("Failed to detect city", err);
+                        setLocation({ lat, lon }); // Still use coordinates even if city name fails
+                    } finally {
+                        setIsLocating(false);
                     }
                 },
                 (err) => {
@@ -137,7 +141,9 @@ export default function SearchPage() {
                 page: currentPage
             };
 
-            if (filters.city === '' && location) {
+            // Always provide coordinates if available to ensure backend can calculate distances,
+            // even if a specific city is selected.
+            if (location) {
                 params.lat = location.lat;
                 params.lon = location.lon;
             }
